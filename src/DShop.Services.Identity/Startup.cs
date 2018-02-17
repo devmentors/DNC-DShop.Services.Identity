@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using DShop.Common.Authentication;
-using DShop.Common.Mongo;
+using DShop.Common.Databases.Mongo;
+using DShop.Common.Mvc;
 using DShop.Services.Identity.Domain;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -30,8 +31,8 @@ namespace DShop.Services.Identity
 
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
-            services.AddJwt(); 
+            services.AddMvc().AddDefaultJsonOptions();
+            services.AddJwt();
             var builder = new ContainerBuilder();
             builder.RegisterAssemblyTypes(Assembly.GetEntryAssembly())
                     .AsImplementedInterfaces();

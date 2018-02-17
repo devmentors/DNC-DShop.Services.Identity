@@ -33,6 +33,7 @@ namespace DShop.Services.Identity.Domain
             Email = email.ToLowerInvariant();
             Role = role;
             CreatedAt = DateTime.UtcNow;
+            UpdatedAt = DateTime.UtcNow;
         }
 
         public void SetPassword(string password, IPasswordHasher<User> passwordHasher)
