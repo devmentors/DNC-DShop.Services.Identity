@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using DShop.Common.Authentication;
-using DShop.Common.Databases.Mongo;
+using DShop.Common.Mongo;
 using DShop.Common.Mvc;
+using DShop.Common.RabbitMq;
 using DShop.Services.Identity.Domain;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -52,6 +53,7 @@ namespace DShop.Services.Identity
                 app.UseDeveloperExceptionPage();
             }
             app.UseMvc();
+            app.UseRabbitMq();
             applicationLifetime.ApplicationStopped.Register(() => Container.Dispose());
         }
     }
