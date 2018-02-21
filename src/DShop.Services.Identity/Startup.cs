@@ -39,6 +39,7 @@ namespace DShop.Services.Identity
                     .AsImplementedInterfaces();
             builder.Populate(services);
             builder.AddMongoDB();
+            builder.AddRabbitMq();
             builder.RegisterType<PasswordHasher<User>>().As<IPasswordHasher<User>>();
             Container = builder.Build();
 
