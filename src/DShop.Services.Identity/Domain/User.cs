@@ -17,7 +17,7 @@ namespace DShop.Services.Identity.Domain
         {
         }
 
-        public User(string email, string role)
+        public User(Guid id, string email, string role)
         {
             if (string.IsNullOrWhiteSpace(email))
             {
@@ -29,7 +29,7 @@ namespace DShop.Services.Identity.Domain
                 throw new DShopException(Codes.InvalidRole, 
                     "Role can not be empty.");
             }        
-            Id = Guid.NewGuid();
+            Id = id;
             Email = email.ToLowerInvariant();
             Role = role;
             CreatedAt = DateTime.UtcNow;

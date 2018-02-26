@@ -7,7 +7,7 @@ namespace DShop.Services.Identity.Services
 {
     public interface IIdentityService
     {
-        Task SignUpAsync(string email, string password, string role = Role.User);
+        Task SignUpAsync(Guid id, string email, string password, string role = Role.User);
         Task<JsonWebToken> SignInAsync(string email, string password);
         Task ChangePasswordAsync(Guid userId, string currentPassword, string newPassword);         
     }

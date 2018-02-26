@@ -31,7 +31,7 @@ namespace DShop.Services.Identity.Services
             _busPublisher = busPublisher;
         }
 
-        public async Task SignUpAsync(string email, string password, string role = Role.User)
+        public async Task SignUpAsync(Guid id, string email, string password, string role = Role.User)
         {
             var user = await _userRepository.GetAsync(email);
             if (user != null)
@@ -42,10 +42,9 @@ namespace DShop.Services.Identity.Services
                     reason, code));
                 throw new DShopException(code, reason);
             }
-            user = new User(email, role);
+            user = new User(id, email, role);
             user.SetPassword(password, _passwordHasher);
             await _userRepository.AddAsync(user);
-            await _busPublisher.PublishEventAsync(new SignedUp(Guid.NewGuid(), user.Id, user.Email));
         }
 
         public async Task<JsonWebToken> SignInAsync(string email, string password)
