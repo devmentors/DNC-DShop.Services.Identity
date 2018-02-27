@@ -34,7 +34,7 @@ namespace DShop.Services.Identity.Services
                 throw new DShopException(Codes.UserNotFound, 
                     $"User: '{userId}' was not found.");
             }
-            await _refreshTokenRepository.AddAsync(new RefreshToken(user, _passwordHasher));
+            await _refreshTokenRepository.CreateAsync(new RefreshToken(user, _passwordHasher));
         }
 
         public async Task<JsonWebToken> CreateAccessTokenAsync(string token)

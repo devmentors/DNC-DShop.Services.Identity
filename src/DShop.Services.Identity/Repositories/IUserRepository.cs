@@ -8,7 +8,7 @@ namespace DShop.Services.Identity.Repositories
     {
         Task<User> GetAsync(Guid id);
         Task<User> GetAsync(string email);
-        Task AddAsync(User user);
+        Task CreateAsync(User user);
         Task UpdateAsync(User user);
     }
 }

@@ -44,7 +44,7 @@ namespace DShop.Services.Identity.Services
             }
             user = new User(id, email, role);
             user.SetPassword(password, _passwordHasher);
-            await _userRepository.AddAsync(user);
+            await _userRepository.CreateAsync(user);
         }
 
         public async Task<JsonWebToken> SignInAsync(string email, string password)

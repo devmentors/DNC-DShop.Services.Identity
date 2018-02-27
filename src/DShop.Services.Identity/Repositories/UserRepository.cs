@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using DShop.Common.Mongo;
 using DShop.Services.Identity.Domain;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
@@ -8,30 +9,23 @@ namespace DShop.Services.Identity.Repositories
 {
     public class UserRepository : IUserRepository
     {
-        private readonly IMongoDatabase _database;
-        
-        public UserRepository(IMongoDatabase database)
+        private readonly IMongoRepository<User> _repository;
+
+        public UserRepository(IMongoRepository<User> repository)
         {
-            _database = database;
+            _repository = repository;
         }
 
         public async Task<User> GetAsync(Guid id)
-            => await Users
-                .AsQueryable()
-                .FirstOrDefaultAsync(x => x.Id == id);
+            => await _repository.GetAsync(id);
 
         public async Task<User> GetAsync(string email)
-            => await Users
-                .AsQueryable()
-                .FirstOrDefaultAsync(x => x.Email == email.ToLowerInvariant());
+            => await _repository.GetAsync(x => x.Email == email.ToLowerInvariant());
 
-        public async Task AddAsync(User user)
-            => await Users.InsertOneAsync(user);
+        public async Task CreateAsync(User user)
+            => await _repository.CreateAsync(user);
 
         public async Task UpdateAsync(User user)
-            => await Users.ReplaceOneAsync(u => u.Id == user.Id, user);
-
-        private IMongoCollection<User> Users 
-            => _database.GetCollection<User>("Users");
+            => await _repository.UpdateAsync(user);
     }
 }

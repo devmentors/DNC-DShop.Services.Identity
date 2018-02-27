@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using DShop.Common.Mongo;
 using DShop.Services.Identity.Domain;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
@@ -8,25 +9,20 @@ namespace DShop.Services.Identity.Repositories
 {
     public class RefreshTokenRepository : IRefreshTokenRepository
     {
-        private readonly IMongoDatabase _database;
+        private readonly IMongoRepository<RefreshToken> _repository;
 
-        public RefreshTokenRepository(IMongoDatabase database)
+        public RefreshTokenRepository(IMongoRepository<RefreshToken> repository)
         {
-            _database = database;
+            _repository = repository;
         }
 
         public async Task<RefreshToken> GetAsync(string token)
-            => await RefreshTokens
-                .AsQueryable()
-                .FirstOrDefaultAsync(x => x.Token == token);
+            => await _repository.GetAsync(x => x.Token == token);
 
-        public async Task AddAsync(RefreshToken token)
-            => await RefreshTokens.InsertOneAsync(token);
+        public async Task CreateAsync(RefreshToken token)
+            => await _repository.CreateAsync(token);
 
         public async Task UpdateAsync(RefreshToken token)
-            => await RefreshTokens.ReplaceOneAsync(x => x.Id == token.Id, token);
-
-        private IMongoCollection<RefreshToken> RefreshTokens 
-            => _database.GetCollection<RefreshToken>("RefreshTokens");
+            => await _repository.UpdateAsync(token);
     }
 }

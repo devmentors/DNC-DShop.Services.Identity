@@ -1,10 +1,11 @@
 using System;
 using DShop.Common.Types;
+using DShop.Messages.Entities;
 using Microsoft.AspNetCore.Identity;
 
 namespace DShop.Services.Identity.Domain
 {
-    public class RefreshToken
+    public class RefreshToken : IIdentifiable
     {
         public Guid Id { get; protected set; }
         public Guid UserId { get; protected set; }
