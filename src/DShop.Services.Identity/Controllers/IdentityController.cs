@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using DShop.Services.Identity.Services;
 using DShop.Messages.Commands.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using DShop.Common.RabbitMq;
 using DShop.Messages.Events.Identity;
 using System;
 
@@ -15,15 +14,12 @@ namespace DShop.Services.Identity.Controllers
     {
         private readonly IIdentityService _identityService;
         private readonly IRefreshTokenService _refreshTokenService;
-        private readonly IBusPublisher _busPublisher;
 
         public IdentityController(IIdentityService identityService,
-            IRefreshTokenService refreshTokenService,
-            IBusPublisher busPublisher)
+            IRefreshTokenService refreshTokenService)
         {
             _identityService = identityService;
             _refreshTokenService = refreshTokenService;
-            _busPublisher = busPublisher;
         }
 
         [HttpGet("me")]
@@ -34,10 +30,7 @@ namespace DShop.Services.Identity.Controllers
         [HttpPost("sign-up")]
         public async Task<IActionResult> SignUp([FromBody] SignUp command)
         {
-            var id = Guid.NewGuid();
-            await _identityService.SignUpAsync(id, command.Email, command.Password);
-            await _busPublisher.PublishEventAsync(new SignedUp(Guid.NewGuid(), id,
-                command.Email,command.FirstName, command.LastName, command.Address));
+            await _identityService.SignUpAsync(Guid.NewGuid(), command.Email, command.Password);
 
             return Created("me", null);
         }

@@ -38,13 +38,13 @@ namespace DShop.Services.Identity.Services
             {
                 var reason = $"Email: '{email}' is already in use.";
                 var code = Codes.EmailInUse;
-                await _busPublisher.PublishEventAsync(new SignUpRejected(Guid.NewGuid(), user.Id,
-                    reason, code));
+                await _busPublisher.PublishEventAsync(new SignUpRejected(user.Id,  reason, code));
                 throw new DShopException(code, reason);
             }
             user = new User(id, email, role);
             user.SetPassword(password, _passwordHasher);
             await _userRepository.CreateAsync(user);
+            await _busPublisher.PublishEventAsync(new SignedUp(id, email));
         }
 
         public async Task<JsonWebToken> SignInAsync(string email, string password)
@@ -54,14 +54,13 @@ namespace DShop.Services.Identity.Services
             {
                 var reason = "Invalid credentials.";
                 var code = Codes.InvalidCredentials;
-                await _busPublisher.PublishEventAsync(new SignInRejected(Guid.NewGuid(), user.Id,
-                    reason, code));
+                await _busPublisher.PublishEventAsync(new SignInRejected(user.Id, reason, code));
                 throw new DShopException(code, reason);
             }
             var refreshToken = new RefreshToken(user, _passwordHasher);
             var jwt = _jwtHandler.CreateToken(user.Id, user.Role);
             jwt.RefreshToken = refreshToken.Token;
-            await _busPublisher.PublishEventAsync(new SignedIn(Guid.NewGuid(), user.Id));
+            await _busPublisher.PublishEventAsync(new SignedIn(user.Id));
 
             return jwt;
         }
