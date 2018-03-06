@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using DShop.Services.Identity.Services;
 using DShop.Messages.Commands.Identity;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using DShop.Messages.Events.Identity;
 using System;
 
@@ -22,17 +21,12 @@ namespace DShop.Services.Identity.Controllers
             _refreshTokenService = refreshTokenService;
         }
 
-        [HttpGet("me")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public IActionResult Get()
-            => Content($"User id: '{User.Identity.Name}'.");
-
         [HttpPost("sign-up")]
         public async Task<IActionResult> SignUp([FromBody] SignUp command)
         {
             await _identityService.SignUpAsync(Guid.NewGuid(), command.Email, command.Password);
 
-            return Created("me", null);
+            return NoContent();
         }
 
         [HttpPost("sign-in")]
