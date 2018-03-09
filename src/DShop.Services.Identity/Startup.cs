@@ -56,6 +56,7 @@ namespace DShop.Services.Identity
                 app.UseDeveloperExceptionPage();
             }
             app.UseAuthentication();
+            app.UseErrorHandler();
             app.UseMvc();
             app.UseRabbitMq();
             applicationLifetime.ApplicationStopped.Register(() => Container.Dispose());
