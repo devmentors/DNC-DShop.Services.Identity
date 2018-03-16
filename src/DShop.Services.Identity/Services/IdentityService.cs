@@ -55,7 +55,7 @@ namespace DShop.Services.Identity.Services
             {
                 var reason = "Invalid credentials.";
                 var code = Codes.InvalidCredentials;
-                await _busPublisher.PublishEventAsync(new SignInRejected(user.Id, reason, code), 
+                await _busPublisher.PublishEventAsync(new SignInRejected(email, reason, code), 
                     new CorrelationContext());
                 throw new DShopException(code, reason);
             }
