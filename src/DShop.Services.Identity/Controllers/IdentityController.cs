@@ -24,7 +24,8 @@ namespace DShop.Services.Identity.Controllers
         [HttpPost("sign-up")]
         public async Task<IActionResult> SignUp([FromBody] SignUp command)
         {
-            await _identityService.SignUpAsync(Guid.NewGuid(), command.Email, command.Password);
+            await _identityService.SignUpAsync(command.Id, 
+                command.Email, command.Password, command.Role);
 
             return NoContent();
         }

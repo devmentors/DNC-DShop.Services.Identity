@@ -23,10 +23,7 @@ namespace DShop.Services.Identity.Domain
             Id = Guid.NewGuid();
             UserId = user.Id;
             CreatedAt = DateTime.UtcNow;
-            Token = passwordHasher.HashPassword(user, Guid.NewGuid().ToString("N"))
-                .Replace("=", string.Empty)
-                .Replace("+", string.Empty)
-                .Replace("/", string.Empty);
+            Token = CreateToken(user, passwordHasher);
         }
 
         public void Revoke()
@@ -38,5 +35,11 @@ namespace DShop.Services.Identity.Domain
             }
             RevokedAt = DateTime.UtcNow;
         }
+
+        private static string CreateToken(User user, IPasswordHasher<User> passwordHasher)
+            => passwordHasher.HashPassword(user, Guid.NewGuid().ToString("N"))
+                .Replace("=", string.Empty)
+                .Replace("+", string.Empty)
+                .Replace("/", string.Empty);
     }
 }

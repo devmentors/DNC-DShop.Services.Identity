@@ -16,19 +16,16 @@ namespace DShop.Services.Identity.Services
         private readonly IPasswordHasher<User> _passwordHasher;
         private readonly IJwtHandler _jwtHandler;
         private readonly IRefreshTokenRepository _refreshTokenRepository;
-        private readonly IBusPublisher _busPublisher;
 
         public IdentityService(IUserRepository userRepository,
             IPasswordHasher<User> passwordHasher,
             IJwtHandler jwtHandler,
-            IRefreshTokenRepository refreshTokenRepository,
-            IBusPublisher busPublisher)
+            IRefreshTokenRepository refreshTokenRepository)
         {
             _userRepository = userRepository;
             _passwordHasher = passwordHasher;
             _jwtHandler = jwtHandler;
             _refreshTokenRepository = refreshTokenRepository;
-            _busPublisher = busPublisher;
         }
 
         public async Task SignUpAsync(Guid id, string email, string password, string role = Role.User)
@@ -36,16 +33,16 @@ namespace DShop.Services.Identity.Services
             var user = await _userRepository.GetAsync(email);
             if (user != null)
             {
-                var reason = $"Email: '{email}' is already in use.";
-                var code = Codes.EmailInUse;
-                await _busPublisher.PublishEventAsync(new SignUpRejected(user.Id,  reason, code), 
-                    new CorrelationContext());
-                throw new DShopException(code, reason);
+                throw new DShopException(Codes.EmailInUse,
+                    $"Email: '{email}' is already in use.");
+            }
+            if (string.IsNullOrWhiteSpace(role))
+            {
+                role = Role.User;
             }
             user = new User(id, email, role);
             user.SetPassword(password, _passwordHasher);
             await _userRepository.CreateAsync(user);
-            await _busPublisher.PublishEventAsync(new SignedUp(id, email), new CorrelationContext());
         }
 
         public async Task<JsonWebToken> SignInAsync(string email, string password)
@@ -53,17 +50,12 @@ namespace DShop.Services.Identity.Services
             var user = await _userRepository.GetAsync(email);
             if (user == null || !user.ValidatePassword(password, _passwordHasher))
             {
-                var reason = "Invalid credentials.";
-                var code = Codes.InvalidCredentials;
-                await _busPublisher.PublishEventAsync(new SignInRejected(email, reason, code), 
-                    new CorrelationContext());
-                throw new DShopException(code, reason);
+                throw new DShopException(Codes.InvalidCredentials,
+                    "Invalid credentials.");
             }
             var refreshToken = new RefreshToken(user, _passwordHasher);
             var jwt = _jwtHandler.CreateToken(user.Id, user.Role);
             jwt.RefreshToken = refreshToken.Token;
-            await _busPublisher.PublishEventAsync(new SignedIn(user.Id), 
-                new CorrelationContext());
 
             return jwt;
         }
@@ -78,7 +70,7 @@ namespace DShop.Services.Identity.Services
             }
             if (!user.ValidatePassword(currentPassword, _passwordHasher))
             {
-                throw new DShopException(Codes.InvalidCredentials, 
+                throw new DShopException(Codes.InvalidCurrentPassword, 
                     "Invalid current password.");
             }
             user.SetPassword(newPassword, _passwordHasher);
