@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using DShop.Services.Identity.Services;
+using DShop.Common.Mvc;
 using DShop.Messages.Commands.Identity;
 using DShop.Messages.Events.Identity;
+using DShop.Services.Identity.Services;
 using System;
 
 namespace DShop.Services.Identity.Controllers
@@ -24,6 +25,7 @@ namespace DShop.Services.Identity.Controllers
         [HttpPost("sign-up")]
         public async Task<IActionResult> SignUp([FromBody] SignUp command)
         {
+            command.BindId(c => c.Id);
             await _identityService.SignUpAsync(command.Id, 
                 command.Email, command.Password, command.Role);
 
