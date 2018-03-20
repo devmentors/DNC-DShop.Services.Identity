@@ -16,16 +16,19 @@ namespace DShop.Services.Identity.Services
         private readonly IPasswordHasher<User> _passwordHasher;
         private readonly IJwtHandler _jwtHandler;
         private readonly IRefreshTokenRepository _refreshTokenRepository;
+        private readonly IBusPublisher _busPublisher;
 
         public IdentityService(IUserRepository userRepository,
             IPasswordHasher<User> passwordHasher,
             IJwtHandler jwtHandler,
-            IRefreshTokenRepository refreshTokenRepository)
+            IRefreshTokenRepository refreshTokenRepository,
+            IBusPublisher busPublisher)
         {
             _userRepository = userRepository;
             _passwordHasher = passwordHasher;
             _jwtHandler = jwtHandler;
             _refreshTokenRepository = refreshTokenRepository;
+            _busPublisher = busPublisher;
         }
 
         public async Task SignUpAsync(Guid id, string email, string password, string role = Role.User)
@@ -43,6 +46,7 @@ namespace DShop.Services.Identity.Services
             user = new User(id, email, role);
             user.SetPassword(password, _passwordHasher);
             await _userRepository.CreateAsync(user);
+            await _busPublisher.PublishEventAsync(new SignedUp(id, email), CorrelationContext.Empty);
         }
 
         public async Task<JsonWebToken> SignInAsync(string email, string password)
