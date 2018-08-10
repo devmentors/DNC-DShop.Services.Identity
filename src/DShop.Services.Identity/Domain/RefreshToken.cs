@@ -1,6 +1,5 @@
 using System;
 using DShop.Common.Types;
-using DShop.Messages.Entities;
 using Microsoft.AspNetCore.Identity;
 
 namespace DShop.Services.Identity.Domain

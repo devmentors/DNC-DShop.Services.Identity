@@ -2,8 +2,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using DShop.Common.Mvc;
-using DShop.Messages.Commands.Identity;
-using DShop.Messages.Events.Identity;
+using DShop.Services.Identity.Messages.Commands;
+using DShop.Services.Identity.Messages.Events;
 using DShop.Services.Identity.Services;
 using System;
 

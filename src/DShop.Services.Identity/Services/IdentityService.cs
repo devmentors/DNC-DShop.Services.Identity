@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using DShop.Common.Authentication;
 using DShop.Common.RabbitMq;
 using DShop.Common.Types;
-using DShop.Messages.Events.Identity;
+using DShop.Services.Identity.Messages.Events;
 using DShop.Services.Identity.Domain;
 using DShop.Services.Identity.Repositories;
 using Microsoft.AspNetCore.Identity;
@@ -46,7 +46,7 @@ namespace DShop.Services.Identity.Services
             user = new User(id, email, role);
             user.SetPassword(password, _passwordHasher);
             await _userRepository.CreateAsync(user);
-            await _busPublisher.PublishEventAsync(new SignedUp(id, email), CorrelationContext.Empty);
+            await _busPublisher.PublishAsync(new SignedUp(id, email), CorrelationContext.Empty);
         }
 
         public async Task<JsonWebToken> SignInAsync(string email, string password)

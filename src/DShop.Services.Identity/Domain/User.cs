@@ -1,7 +1,6 @@
 using System;
 using System.Text.RegularExpressions;
 using DShop.Common.Types;
-using DShop.Messages.Entities;
 using Microsoft.AspNetCore.Identity;
 
 namespace DShop.Services.Identity.Domain
