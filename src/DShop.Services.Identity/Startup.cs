@@ -5,7 +5,9 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using DShop.Common.AppMetrics;
 using DShop.Common.Authentication;
+using DShop.Common.Dispatchers;
 using DShop.Common.Mongo;
 using DShop.Common.Mvc;
 using DShop.Common.RabbitMq;
@@ -32,7 +34,8 @@ namespace DShop.Services.Identity
 
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().AddDefaultJsonOptions();
+            services.AddCustomMvc();
+            services.AddAppMetrics();
             services.AddJwt();
             var builder = new ContainerBuilder();
             builder.RegisterAssemblyTypes(Assembly.GetEntryAssembly())
@@ -42,6 +45,7 @@ namespace DShop.Services.Identity
             builder.AddMongoDBRepository<RefreshToken>("RefreshTokens");
             builder.AddMongoDBRepository<User>("Users");
             builder.AddRabbitMq();
+            builder.AddDispatchers();
             builder.RegisterType<PasswordHasher<User>>().As<IPasswordHasher<User>>();
             Container = builder.Build();
 
@@ -55,6 +59,7 @@ namespace DShop.Services.Identity
             {
                 app.UseDeveloperExceptionPage();
             }
+            app.UseAppMetrics(applicationLifetime);
             app.UseAuthentication();
             app.UseErrorHandler();
             app.UseMvc();
