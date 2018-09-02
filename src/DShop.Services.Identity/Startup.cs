@@ -12,6 +12,7 @@ using DShop.Common.Dispatchers;
 using DShop.Common.Mongo;
 using DShop.Common.Mvc;
 using DShop.Common.RabbitMq;
+using DShop.Common.Swagger;
 using DShop.Services.Identity.Domain;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -37,6 +38,7 @@ namespace DShop.Services.Identity
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services.AddCustomMvc();
+            services.AddSwaggerDocs();
             services.AddConsul();
             services.AddJwt();
             services.AddCors(options =>
@@ -52,9 +54,9 @@ namespace DShop.Services.Identity
             builder.RegisterAssemblyTypes(Assembly.GetEntryAssembly())
                     .AsImplementedInterfaces();
             builder.Populate(services);
-            builder.AddMongoDB();
-            builder.AddMongoDBRepository<RefreshToken>("RefreshTokens");
-            builder.AddMongoDBRepository<User>("Users");
+            builder.AddMongo();
+            builder.AddMongoRepository<RefreshToken>("RefreshTokens");
+            builder.AddMongoRepository<User>("Users");
             builder.AddRabbitMq();
             builder.AddDispatchers();
             builder.RegisterType<PasswordHasher<User>>().As<IPasswordHasher<User>>();
@@ -70,6 +72,8 @@ namespace DShop.Services.Identity
             {
                 app.UseDeveloperExceptionPage();
             }
+            app.UseAllForwardedHeaders();
+            app.UseSwaggerDocs();
             app.UseErrorHandler();
             app.UseAuthentication();
             app.UseCors("CorsPolicy");
