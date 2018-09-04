@@ -56,7 +56,7 @@ namespace DShop.Services.Identity.Services
                 throw new DShopException(Codes.UserNotFound, 
                     $"User: '{refreshToken.UserId}' was not found.");
             }
-            var jwt = _jwtHandler.CreateToken(user.Id, user.Role);
+            var jwt = _jwtHandler.CreateToken(user.Id.ToString("N"), user.Role);
             jwt.RefreshToken = refreshToken.Token;
             
             return jwt;

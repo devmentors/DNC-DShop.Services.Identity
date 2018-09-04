@@ -58,7 +58,7 @@ namespace DShop.Services.Identity.Services
                     "Invalid credentials.");
             }
             var refreshToken = new RefreshToken(user, _passwordHasher);
-            var jwt = _jwtHandler.CreateToken(user.Id, user.Role);
+            var jwt = _jwtHandler.CreateToken(user.Id.ToString("N"), user.Role);
             jwt.RefreshToken = refreshToken.Token;
 
             return jwt;

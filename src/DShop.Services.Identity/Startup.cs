@@ -12,6 +12,7 @@ using DShop.Common.Dispatchers;
 using DShop.Common.Mongo;
 using DShop.Common.Mvc;
 using DShop.Common.RabbitMq;
+using DShop.Common.Redis;
 using DShop.Common.Swagger;
 using DShop.Services.Identity.Domain;
 using Microsoft.AspNetCore.Builder;
@@ -26,7 +27,7 @@ namespace DShop.Services.Identity
 {
     public class Startup
     {
-        private static readonly string[] Headers = new []{"X-Operation", "X-Resource", "X-Total-Count"};
+        private static readonly string[] Headers = new []{ "X-Operation", "X-Resource", "X-Total-Count" };
         public IConfiguration Configuration { get; }
         public IContainer Container { get; private set; }
 
@@ -41,6 +42,7 @@ namespace DShop.Services.Identity
             services.AddSwaggerDocs();
             services.AddConsul();
             services.AddJwt();
+            services.AddRedis();
             services.AddCors(options =>
             {
                 options.AddPolicy("CorsPolicy", cors => 
@@ -50,6 +52,7 @@ namespace DShop.Services.Identity
                             .AllowCredentials()
                             .WithExposedHeaders(Headers));
             });
+
             var builder = new ContainerBuilder();
             builder.RegisterAssemblyTypes(Assembly.GetEntryAssembly())
                     .AsImplementedInterfaces();
@@ -60,6 +63,7 @@ namespace DShop.Services.Identity
             builder.AddRabbitMq();
             builder.AddDispatchers();
             builder.RegisterType<PasswordHasher<User>>().As<IPasswordHasher<User>>();
+
             Container = builder.Build();
 
             return new AutofacServiceProvider(Container);
@@ -72,6 +76,7 @@ namespace DShop.Services.Identity
             {
                 app.UseDeveloperExceptionPage();
             }
+            
             app.UseAllForwardedHeaders();
             app.UseSwaggerDocs();
             app.UseErrorHandler();
@@ -80,6 +85,7 @@ namespace DShop.Services.Identity
             app.UseServiceId();
             app.UseMvc();
             app.UseRabbitMq();
+
             var consulServiceId = app.UseConsul();
             applicationLifetime.ApplicationStopped.Register(() => 
             { 
