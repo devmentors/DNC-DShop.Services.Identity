@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Consul;
+using DShop.Common;
 using DShop.Common.Authentication;
 using DShop.Common.Consul;
 using DShop.Common.Dispatchers;
@@ -43,6 +44,7 @@ namespace DShop.Services.Identity
             services.AddConsul();
             services.AddJwt();
             services.AddRedis();
+            services.AddInitializers(typeof(IMongoDbInitializer));
             services.AddCors(options =>
             {
                 options.AddPolicy("CorsPolicy", cors => 
@@ -70,7 +72,8 @@ namespace DShop.Services.Identity
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, 
-            IApplicationLifetime applicationLifetime, IConsulClient client)
+            IApplicationLifetime applicationLifetime, IConsulClient client,
+            IStartupInitializer startupInitializer)
         {
             if (env.IsDevelopment() || env.EnvironmentName == "local")
             {
@@ -92,6 +95,8 @@ namespace DShop.Services.Identity
                 client.Agent.ServiceDeregister(consulServiceId); 
                 Container.Dispose(); 
             });
+
+            startupInitializer.InitializeAsync();
         }
     }
 }
