@@ -7,6 +7,7 @@ using DShop.Services.Identity.Messages.Events;
 using DShop.Services.Identity.Domain;
 using DShop.Services.Identity.Repositories;
 using Microsoft.AspNetCore.Identity;
+using System.Collections.Generic;
 
 namespace DShop.Services.Identity.Services
 {
@@ -16,18 +17,21 @@ namespace DShop.Services.Identity.Services
         private readonly IPasswordHasher<User> _passwordHasher;
         private readonly IJwtHandler _jwtHandler;
         private readonly IRefreshTokenRepository _refreshTokenRepository;
+        private readonly IClaimsProvider _claimsProvider;
         private readonly IBusPublisher _busPublisher;
 
         public IdentityService(IUserRepository userRepository,
             IPasswordHasher<User> passwordHasher,
             IJwtHandler jwtHandler,
             IRefreshTokenRepository refreshTokenRepository,
+            IClaimsProvider claimsProvider,
             IBusPublisher busPublisher)
         {
             _userRepository = userRepository;
             _passwordHasher = passwordHasher;
             _jwtHandler = jwtHandler;
             _refreshTokenRepository = refreshTokenRepository;
+            _claimsProvider = claimsProvider;
             _busPublisher = busPublisher;
         }
 
@@ -58,8 +62,10 @@ namespace DShop.Services.Identity.Services
                     "Invalid credentials.");
             }
             var refreshToken = new RefreshToken(user, _passwordHasher);
-            var jwt = _jwtHandler.CreateToken(user.Id.ToString("N"), user.Role);
+            var claims = await _claimsProvider.GetAsync(user.Id);
+            var jwt = _jwtHandler.CreateToken(user.Id.ToString("N"), user.Role, claims);
             jwt.RefreshToken = refreshToken.Token;
+            await _refreshTokenRepository.AddAsync(refreshToken);
 
             return jwt;
         }

@@ -1,8 +1,10 @@
 using System;
 using System.Threading.Tasks;
 using DShop.Common.Authentication;
+using DShop.Common.RabbitMq;
 using DShop.Common.Types;
 using DShop.Services.Identity.Domain;
+using DShop.Services.Identity.Messages.Events;
 using DShop.Services.Identity.Repositories;
 using Microsoft.AspNetCore.Identity;
 
@@ -14,16 +16,22 @@ namespace DShop.Services.Identity.Services
         private readonly IUserRepository _userRepository;
         private readonly IJwtHandler _jwtHandler;
         private readonly IPasswordHasher<User> _passwordHasher;
+        private readonly IClaimsProvider _claimsProvider;
+        private readonly IBusPublisher _busPublisher;
 
         public RefreshTokenService(IRefreshTokenRepository refreshTokenRepository,
             IUserRepository userRepository,
             IJwtHandler jwtHandler,
-            IPasswordHasher<User> passwordHasher)
+            IPasswordHasher<User> passwordHasher,
+            IClaimsProvider claimsProvider,
+            IBusPublisher busPublisher)
         {
             _refreshTokenRepository = refreshTokenRepository;
             _userRepository = userRepository;
             _jwtHandler = jwtHandler;
             _passwordHasher = passwordHasher;
+            _claimsProvider = claimsProvider;
+            _busPublisher = busPublisher;
         }
 
         public async Task AddAsync(Guid userId)
@@ -56,8 +64,10 @@ namespace DShop.Services.Identity.Services
                 throw new DShopException(Codes.UserNotFound, 
                     $"User: '{refreshToken.UserId}' was not found.");
             }
-            var jwt = _jwtHandler.CreateToken(user.Id.ToString("N"), user.Role);
+            var claims = await _claimsProvider.GetAsync(user.Id);
+            var jwt = _jwtHandler.CreateToken(user.Id.ToString("N"), user.Role, claims);
             jwt.RefreshToken = refreshToken.Token;
+            await _busPublisher.PublishAsync(new AccessTokenRefreshed(user.Id), CorrelationContext.Empty);
             
             return jwt;
         }
@@ -72,6 +82,7 @@ namespace DShop.Services.Identity.Services
             }
             refreshToken.Revoke();
             await _refreshTokenRepository.UpdateAsync(refreshToken);
+            await _busPublisher.PublishAsync(new RefreshTokenRevoked(refreshToken.UserId), CorrelationContext.Empty);
         }
     }
 }

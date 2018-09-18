@@ -80,11 +80,12 @@ namespace DShop.Services.Identity
                 app.UseDeveloperExceptionPage();
             }
             
+            app.UseCors("CorsPolicy");
             app.UseAllForwardedHeaders();
             app.UseSwaggerDocs();
             app.UseErrorHandler();
             app.UseAuthentication();
-            app.UseCors("CorsPolicy");
+            app.UseAccessTokenValidator();
             app.UseServiceId();
             app.UseMvc();
             app.UseRabbitMq();

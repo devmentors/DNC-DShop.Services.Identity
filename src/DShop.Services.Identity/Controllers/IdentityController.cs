@@ -6,12 +6,13 @@ using DShop.Services.Identity.Messages.Commands;
 using DShop.Services.Identity.Messages.Events;
 using DShop.Services.Identity.Services;
 using System;
+using DShop.Common.Authentication;
 
 namespace DShop.Services.Identity.Controllers
 {
     [Route("")]
     [ApiController]
-    public class IdentityController : ControllerBase
+    public class IdentityController : BaseController
     {
         private readonly IIdentityService _identityService;
         private readonly IRefreshTokenService _refreshTokenService;
@@ -22,6 +23,10 @@ namespace DShop.Services.Identity.Controllers
             _identityService = identityService;
             _refreshTokenService = refreshTokenService;
         }
+
+        [HttpGet("me")]
+        [JwtAuth]
+        public IActionResult Get() => Content($"Your id: '{UserId:N}'.");
 
         [HttpPost("sign-up")]
         public async Task<IActionResult> SignUp(SignUp command)
@@ -36,9 +41,5 @@ namespace DShop.Services.Identity.Controllers
         [HttpPost("sign-in")]
         public async Task<IActionResult> SignIn(SignIn command)
             => Ok(await _identityService.SignInAsync(command.Email, command.Password));
-
-        [HttpPost("refresh-tokens/{refreshToken}/refresh")]
-        public async Task<IActionResult> RefreshToken(string refreshToken)
-            => Ok(await _refreshTokenService.CreateAccessTokenAsync(refreshToken));
     }
 }
