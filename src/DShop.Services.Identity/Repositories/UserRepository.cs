@@ -22,8 +22,8 @@ namespace DShop.Services.Identity.Repositories
         public async Task<User> GetAsync(string email)
             => await _repository.GetAsync(x => x.Email == email.ToLowerInvariant());
 
-        public async Task CreateAsync(User user)
-            => await _repository.CreateAsync(user);
+        public async Task AddAsync(User user)
+            => await _repository.AddAsync(user);
 
         public async Task UpdateAsync(User user)
             => await _repository.UpdateAsync(user);

@@ -6,11 +6,11 @@ namespace DShop.Services.Identity.Domain
 {
     public class RefreshToken : IIdentifiable
     {
-        public Guid Id { get; protected set; }
-        public Guid UserId { get; protected set; }
-        public string Token { get; protected set; }
-        public DateTime CreatedAt { get; protected set; }
-        public DateTime? RevokedAt { get; protected set; }
+        public Guid Id { get; private set; }
+        public Guid UserId { get; private set; }
+        public string Token { get; private set; }
+        public DateTime CreatedAt { get; private set; }
+        public DateTime? RevokedAt { get; private set; }
         public bool Revoked => RevokedAt.HasValue;
 
         protected RefreshToken()

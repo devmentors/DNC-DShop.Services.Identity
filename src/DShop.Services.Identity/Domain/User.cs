@@ -12,12 +12,12 @@ namespace DShop.Services.Identity.Domain
             @"(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-z][-\w]*[0-9a-z]*\.)+[a-z0-9][\-a-z0-9]{0,22}[a-z0-9]))$",
             RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.CultureInvariant);
             
-        public Guid Id { get; protected set; }
-        public string Email { get; protected set; }
-        public string Role { get; protected set; }
-        public string PasswordHash { get; protected set; }
-        public DateTime CreatedAt { get; protected set; }
-        public DateTime UpdatedAt { get; protected set; }
+        public Guid Id { get; private set; }
+        public string Email { get; private set; }
+        public string Role { get; private set; }
+        public string PasswordHash { get; private set; }
+        public DateTime CreatedAt { get; private set; }
+        public DateTime UpdatedAt { get; private set; }
 
         protected User()
         {

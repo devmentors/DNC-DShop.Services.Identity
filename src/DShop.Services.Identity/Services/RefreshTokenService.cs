@@ -26,7 +26,7 @@ namespace DShop.Services.Identity.Services
             _passwordHasher = passwordHasher;
         }
 
-        public async Task CreateAsync(Guid userId)
+        public async Task AddAsync(Guid userId)
         {
             var user = await _userRepository.GetAsync(userId);
             if (user == null)
@@ -34,7 +34,7 @@ namespace DShop.Services.Identity.Services
                 throw new DShopException(Codes.UserNotFound, 
                     $"User: '{userId}' was not found.");
             }
-            await _refreshTokenRepository.CreateAsync(new RefreshToken(user, _passwordHasher));
+            await _refreshTokenRepository.AddAsync(new RefreshToken(user, _passwordHasher));
         }
 
         public async Task<JsonWebToken> CreateAccessTokenAsync(string token)

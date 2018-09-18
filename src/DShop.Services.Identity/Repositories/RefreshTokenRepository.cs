@@ -19,8 +19,8 @@ namespace DShop.Services.Identity.Repositories
         public async Task<RefreshToken> GetAsync(string token)
             => await _repository.GetAsync(x => x.Token == token);
 
-        public async Task CreateAsync(RefreshToken token)
-            => await _repository.CreateAsync(token);
+        public async Task AddAsync(RefreshToken token)
+            => await _repository.AddAsync(token);
 
         public async Task UpdateAsync(RefreshToken token)
             => await _repository.UpdateAsync(token);

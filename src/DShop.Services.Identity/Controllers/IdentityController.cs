@@ -11,7 +11,7 @@ namespace DShop.Services.Identity.Controllers
 {
     [Route("")]
     [ApiController]
-    public class IdentityController : Controller
+    public class IdentityController : ControllerBase
     {
         private readonly IIdentityService _identityService;
         private readonly IRefreshTokenService _refreshTokenService;
