@@ -76,7 +76,7 @@ namespace DShop.Services.Identity.Services
             if (user == null)
             {
                 throw new DShopException(Codes.UserNotFound, 
-                    $"User: '{userId}' was not found.");
+                    $"User with id: '{userId}' was not found.");
             }
             if (!user.ValidatePassword(currentPassword, _passwordHasher))
             {
@@ -84,7 +84,8 @@ namespace DShop.Services.Identity.Services
                     "Invalid current password.");
             }
             user.SetPassword(newPassword, _passwordHasher);
-            await _userRepository.UpdateAsync(user);            
+            await _userRepository.UpdateAsync(user);
+            await _busPublisher.PublishAsync(new PasswordChanged(userId), CorrelationContext.Empty);         
         }
     }
 }
