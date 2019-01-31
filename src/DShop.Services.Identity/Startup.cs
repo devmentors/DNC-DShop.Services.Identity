@@ -7,6 +7,7 @@ using DShop.Common;
 using DShop.Common.Authentication;
 using DShop.Common.Consul;
 using DShop.Common.Dispatchers;
+using DShop.Common.Jaeger;
 using DShop.Common.Mongo;
 using DShop.Common.Mvc;
 using DShop.Common.RabbitMq;
@@ -40,6 +41,8 @@ namespace DShop.Services.Identity
             services.AddSwaggerDocs();
             services.AddConsul();
             services.AddJwt();
+            services.AddJaeger();
+            services.AddOpenTracing();
             services.AddRedis();
             services.AddInitializers(typeof(IMongoDbInitializer));
             services.AddCors(options =>
